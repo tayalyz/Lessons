@@ -30,6 +30,32 @@ public class StreamAPITasks {
         }
     }
 
+    public static class Product {
+        private String name;
+        private int price;
+
+        public Product(String name, int price) {
+            this.name = name;
+            this.price = price;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getPrice() {
+            return price;
+        }
+
+        @Override
+        public String toString() {
+            return "Product{" +
+                    "name='" + name + '\'' +
+                    ", price=" + price +
+                    '}';
+        }
+    }
+
     public static void main(String[] args) {
         Person person1 = new Person("Ivan", 8);
         Person person2 = new Person("Ivan", 18);
@@ -37,10 +63,15 @@ public class StreamAPITasks {
         Person person4 = new Person("Ivan", 500);
         Person person5 = new Person("Ivan", 18);
 
+        Product product1 = new Product("iphone 15", 100);
+        Product product2 = new Product("iphone 15 pro", 200);
+        Product product3 = new Product("iphone 15 pro max", 300);
+
         List<String> list = Arrays.asList("ASD", "ASD1", "123", "234", "2D", "ASD");
         List<Integer> integerList = Arrays.asList(1, 2, 3, 3, 5, 4, 4);
         List<String> stringList = List.of("aaaa", "bbbbA", "bbbbA", "Accccc", "A", "jgyj", ",A");
         List<Person> personList = Arrays.asList(person1, person2, person3, person4, person5);
+        List<Product> productList = Arrays.asList(product1, product2, product3);
 
         task1(list);
         task2(integerList);
@@ -51,7 +82,7 @@ public class StreamAPITasks {
         task7(integerList);
         task8(stringList);
         task9(stringList);
-        task10(personList);
+        task10(productList);
     }
 
     // Задача 1: Дан список строк, отфильтруйте те, которые содержат хотя бы одну цифру, и преобразуйте их в нижний регистр.
@@ -98,7 +129,7 @@ public class StreamAPITasks {
         int res = list.stream()
                 .mapToInt(Integer::intValue)
                 .filter(i -> i % 2 == 0)
-                .sum();
+                .reduce(1, (s1, s2) -> s1 * s2);
 
         System.out.println(res);
     }
@@ -106,7 +137,7 @@ public class StreamAPITasks {
     //Задача 6: Дан список строк, найдите длину самой длинной строки.
     public static void task6(List<String> list) {
         int res = list.stream()
-                .reduce((s1, s2) -> s1.length() > s2.length() ? s1 : s2)
+                .max(Comparator.comparing(String::length))
                 .orElse("Список пуст")
                 .length();
 
@@ -128,10 +159,12 @@ public class StreamAPITasks {
 
     //Задача 8: Дан список строк, создайте мапу, где ключами будут первые буквы строк, а значениями - списки строк, начинающихся с этих букв.
     public static void task8(List<String> list) {
-        Map<String, String> map = list.stream()
-                .collect(Collectors.toMap((c -> c.substring(0,1)), f -> f, (s, a) -> s + ", " + a));
+        Map<Character, List<String>> groupedStrings = list.stream()
+                .collect(Collectors.groupingBy(i-> i.charAt(0), Collectors.toList()));
 
-        System.out.println(map);
+        System.out.println(groupedStrings);
+        System.out.println("Группировка строк по первой букве:");
+        groupedStrings.forEach((key, value) -> System.out.println(key + ": " + value));
     }
 
     //Задача 9: Дан список строк, подсчитайте, сколько раз каждая строка встречается в списке.
@@ -143,11 +176,11 @@ public class StreamAPITasks {
     }
 
     //Задача 10: Дан список объектов Product (с полями name и price), найдите самый дорогой продукт.
-    public static void task10(List<Person> list) {
-        Person person = list.stream()
-                .reduce((p1, p2) -> p1.getAge() > p2.getAge() ? p1 : p2)
-                .orElse(null);  // get()
+    public static void task10(List<Product> list) {
+        Product product1 = list.stream()
+                .max(Comparator.comparing(Product::getPrice))
+                .orElse(null); // v2
 
-        System.out.println(person);
+        System.out.println(product1);
     }
 }
